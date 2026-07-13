@@ -1,7 +1,7 @@
 {
   "name": "Kids Apps",
   "short_name": "Kids Apps",
-  "start_url": "./Kids Apps.dc.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#FBF6EF",
