@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="manifest" href="trivia-manifest.webmanifest">
+  <link rel="apple-touch-icon" href="trivia-icon-180.png">
+  <link rel="icon" href="trivia-icon-512.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Kids Trivia">
+  <meta name="theme-color" content="#8E6FBF">
+  <style>
+    @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    @keyframes floatIn { from { transform: translateY(14px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    html, body { margin: 0; background: oklch(0.97 0.015 70); overscroll-behavior: none; -webkit-user-select: none; user-select: none; }
+    * { -webkit-tap-highlight-color: transparent; }
+  </style>
+</helmet>
+<div style="width:100%;height:100vh;box-sizing:border-box;font-family:'Poppins',sans-serif;background:oklch(0.97 0.015 70);overflow:hidden;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);position:relative;">
+
+  <a href="Kids Apps.dc.html" style="position:absolute;top:calc(10px + env(safe-area-inset-top));left:calc(10px + env(safe-area-inset-left));z-index:100;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,0.35);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;text-decoration:none;">&#8962;</a>
+
+  <sc-if value="{{ isLevelSelect }}" hint-placeholder-val="{{ true }}">
+    <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:14px;box-sizing:border-box;">
+      <div style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(30px,6vw,46px);color:#3A2E28;">Kids Trivia</div>
+      <div style="font-size:16px;color:#8a7d72;margin-bottom:14px;">Choose your level</div>
+      <div style="display:flex;flex-direction:column;gap:16px;width:100%;max-width:420px;">
+        <sc-for list="{{ levels }}" as="lvl" hint-placeholder-count="3">
+          <div onClick="{{ lvl.select }}" style="animation:popIn 0.35s ease backwards;cursor:pointer;background:{{ lvl.color }};border-radius:22px;padding:22px 24px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 8px 20px -8px rgba(0,0,0,0.28);">
+            <div>
+              <div style="font-family:'Baloo 2',sans-serif;font-weight:700;font-size:22px;color:#fff;">{{ lvl.label }}</div>
+              <div style="font-size:14px;color:rgba(255,255,255,0.85);">{{ lvl.age }}</div>
+            </div>
+            <div style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:28px;color:#fff;">&#8250;</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isQuiz }}" hint-placeholder-val="{{ false }}">
+    <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;padding:calc(56px + env(safe-area-inset-top)) 24px 24px;box-sizing:border-box;">
+      <div style="width:100%;max-width:520px;display:flex;flex-direction:column;align-items:center;gap:18px;">
+        <div style="width:100%;height:10px;border-radius:6px;background:#eee0d2;overflow:hidden;">
+          <div style="height:100%;border-radius:6px;background:{{ levelColor }};width:{{ progressPct }}%;transition:width 0.3s ease;"></div>
+        </div>
+        <div style="font-size:14px;color:#8a7d72;font-weight:600;">Question {{ questionNumberDisplay }} of {{ totalQuestions }} &middot; Score {{ score }}</div>
+
+        <div style="width:100%;background:#fff;border-radius:24px;padding:28px 24px;box-shadow:0 8px 24px -10px rgba(0,0,0,0.15);animation:floatIn 0.3s ease;box-sizing:border-box;">
+          <div style="font-family:'Baloo 2',sans-serif;font-weight:700;font-size:clamp(20px,4vw,26px);color:#3A2E28;text-align:center;line-height:1.3;">{{ currentQuestion }}</div>
+        </div>
+
+        <div style="width:100%;display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <sc-for list="{{ answerOptions }}" as="opt" hint-placeholder-count="4">
+            <div onClick="{{ opt.select }}" style="cursor:pointer;background:{{ opt.bg }};color:{{ opt.fg }};border-radius:18px;padding:20px 14px;text-align:center;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:17px;box-shadow:0 4px 12px -6px rgba(0,0,0,0.2);border:{{ opt.border }};transition:transform 0.15s ease;">{{ opt.text }}</div>
+          </sc-for>
+        </div>
+
+        <sc-if value="{{ showNext }}" hint-placeholder-val="{{ false }}">
+          <div onClick="{{ next }}" style="cursor:pointer;margin-top:6px;background:#3A2E28;color:#fff;border-radius:16px;padding:14px 32px;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:17px;animation:popIn 0.25s ease;">{{ nextLabel }}</div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isResult }}" hint-placeholder-val="{{ false }}">
+    <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:16px;box-sizing:border-box;text-align:center;">
+      <div style="font-size:56px;">{{ resultEmoji }}</div>
+      <div style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(24px,5vw,34px);color:#3A2E28;">{{ resultMessage }}</div>
+      <div style="font-size:18px;color:#8a7d72;">You got {{ score }} out of {{ totalQuestions }} right!</div>
+      <div style="display:flex;gap:14px;margin-top:12px;">
+        <div onClick="{{ playAgain }}" style="cursor:pointer;background:{{ levelColor }};color:#fff;border-radius:16px;padding:14px 26px;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:16px;">Play Again</div>
+        <div onClick="{{ backToLevels }}" style="cursor:pointer;background:#eee0d2;color:#3A2E28;border-radius:16px;padding:14px 26px;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:16px;">Choose Level</div>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+class Component extends DCLogic {
+  state = {
+    dataLoaded: false,
+    levelsMeta: [],
+    questionsByLevel: {},
+    screen: 'levelSelect',
+    levelId: null,
+    order: [],
+    idx: 0,
+    score: 0,
+    selected: null,
+    locked: false
+  };
+
+  componentDidMount() {
+    import('./kids-trivia-data.js').then(mod => {
+      this.setState({
+        dataLoaded: true,
+        levelsMeta: mod.LEVELS,
+        questionsByLevel: mod.QUESTIONS
+      });
+    });
+  }
+
+  selectLevel(levelId) {
+    const qs = this.state.questionsByLevel[levelId] || [];
+    const order = shuffle(qs.map((_, i) => i));
+    this.setState({
+      screen: 'quiz',
+      levelId,
+      order,
+      idx: 0,
+      score: 0,
+      selected: null,
+      locked: false
+    });
+  }
+
+  pickAnswer(optionIndex, correctIndex) {
+    if (this.state.locked) return;
+    const isCorrect = optionIndex === correctIndex;
+    this.setState(s => ({
+      selected: optionIndex,
+      locked: true,
+      score: isCorrect ? s.score + 1 : s.score
+    }));
+  }
+
+  next() {
+    const isLast = this.state.idx >= this.state.order.length - 1;
+    if (isLast) {
+      this.setState({ screen: 'result' });
+    } else {
+      this.setState(s => ({ idx: s.idx + 1, selected: null, locked: false }));
+    }
+  }
+
+  playAgain() {
+    const qs = this.state.questionsByLevel[this.state.levelId] || [];
+    const order = shuffle(qs.map((_, i) => i));
+    this.setState({ screen: 'quiz', order, idx: 0, score: 0, selected: null, locked: false });
+  }
+
+  backToLevels() {
+    this.setState({ screen: 'levelSelect', levelId: null });
+  }
+
+  renderVals() {
+    const { levelsMeta, questionsByLevel, screen, levelId, order, idx, score, selected, locked, dataLoaded } = this.state;
+
+    const levels = (levelsMeta || []).map(lvl => ({
+      label: lvl.label,
+      age: lvl.age,
+      color: lvl.color,
+      select: () => this.selectLevel(lvl.id)
+    }));
+
+    const meta = (levelsMeta || []).find(l => l.id === levelId);
+    const levelColor = meta ? meta.color : '#8E6FBF';
+    const qs = (questionsByLevel && levelId) ? (questionsByLevel[levelId] || []) : [];
+    const total = order.length;
+    const qIndex = order[idx];
+    const q = qs[qIndex];
+
+    let answerOptions = [];
+    if (q) {
+      answerOptions = q.options.map((text, i) => {
+        let bg = '#fff', fg = '#3A2E28', border = '2px solid #eee0d2';
+        if (locked) {
+          if (i === q.correct) { bg = '#6FBF73'; fg = '#fff'; border = '2px solid #6FBF73'; }
+          else if (i === selected) { bg = '#E76F6F'; fg = '#fff'; border = '2px solid #E76F6F'; }
+          else { bg = '#faf6ef'; fg = '#b8ab9d'; border = '2px solid #eee0d2'; }
+        }
+        return { text, bg, fg, border, select: () => this.pickAnswer(i, q.correct) };
+      });
+    }
+
+    const pct = total > 0 ? (score / total) : 0;
+    const resultEmoji = pct >= 0.8 ? '\u{1F3C6}' : pct >= 0.5 ? '\u{1F31F}' : '\u{1F642}';
+    const resultMessage = pct >= 0.8 ? 'Amazing job!' : pct >= 0.5 ? 'Great effort!' : 'Nice try!';
+
+    return {
+      isLevelSelect: dataLoaded && screen === 'levelSelect',
+      isQuiz: dataLoaded && screen === 'quiz' && !!q,
+      isResult: dataLoaded && screen === 'result',
+      levels,
+      levelColor,
+      currentQuestion: q ? q.q : '',
+      answerOptions,
+      questionNumberDisplay: idx + 1,
+      totalQuestions: total,
+      progressPct: total > 0 ? Math.round(((idx + (locked ? 1 : 0)) / total) * 100) : 0,
+      score,
+      showNext: locked,
+      nextLabel: idx >= total - 1 ? 'See Results' : 'Next Question',
+      next: () => this.next(),
+      resultEmoji,
+      resultMessage,
+      playAgain: () => this.playAgain(),
+      backToLevels: () => this.backToLevels()
+    };
+  }
+}
+</script>
+</body>
+</html>

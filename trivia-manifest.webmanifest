@@ -1,0 +1,13 @@
+{
+  "name": "Kids Trivia",
+  "short_name": "Trivia",
+  "start_url": "./Kids Trivia.dc.html",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#FBF6EF",
+  "theme_color": "#8E6FBF",
+  "icons": [
+    { "src": "trivia-icon-180.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "trivia-icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
